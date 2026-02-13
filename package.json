@@ -1,0 +1,24 @@
+{
+  "name": "marketpulse-ai",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AI-Powered SEO & SEM Command Center",
+  "workspaces": [
+    "packages/shared",
+    "packages/server",
+    "packages/client"
+  ],
+  "scripts": {
+    "dev:server": "npm run dev --workspace=packages/server",
+    "dev:client": "npm run dev --workspace=packages/client",
+    "build:shared": "npm run build --workspace=packages/shared",
+    "build:server": "npm run build --workspace=packages/server",
+    "build:client": "npm run build --workspace=packages/client",
+    "build": "npm run build:shared && npm run build:server && npm run build:client",
+    "db:migrate": "npm run migrate --workspace=packages/server",
+    "db:seed": "npm run seed --workspace=packages/server"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
