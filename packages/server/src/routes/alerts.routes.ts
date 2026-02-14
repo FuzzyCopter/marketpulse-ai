@@ -16,7 +16,7 @@ router.get('/rules', (req: Request, res: Response): void => {
 });
 
 router.get('/rules/:id', (req: Request, res: Response): void => {
-  const rule = getAlertRule(parseInt(req.params.id));
+  const rule = getAlertRule(parseInt(req.params.id as string));
   if (!rule) { res.status(404).json({ error: 'Rule not found' }); return; }
   res.json(rule);
 });
@@ -27,13 +27,13 @@ router.post('/rules', (req: Request, res: Response): void => {
 });
 
 router.patch('/rules/:id', (req: Request, res: Response): void => {
-  const updated = updateAlertRule(parseInt(req.params.id), req.body);
+  const updated = updateAlertRule(parseInt(req.params.id as string), req.body);
   if (!updated) { res.status(404).json({ error: 'Rule not found' }); return; }
   res.json(updated);
 });
 
 router.delete('/rules/:id', (req: Request, res: Response): void => {
-  const deleted = deleteAlertRule(parseInt(req.params.id));
+  const deleted = deleteAlertRule(parseInt(req.params.id as string));
   if (!deleted) { res.status(404).json({ error: 'Rule not found' }); return; }
   res.json({ message: 'Rule deleted' });
 });
@@ -47,7 +47,7 @@ router.get('/events', (req: Request, res: Response): void => {
 });
 
 router.post('/events/:id/acknowledge', (req: Request, res: Response): void => {
-  const event = acknowledgeEvent(parseInt(req.params.id), req.user!.userId);
+  const event = acknowledgeEvent(parseInt(req.params.id as string), req.user!.userId);
   if (!event) { res.status(404).json({ error: 'Event not found' }); return; }
   res.json(event);
 });
@@ -62,14 +62,14 @@ router.post('/events/acknowledge-all', (req: Request, res: Response): void => {
 // === Evaluate ===
 
 router.post('/evaluate/:campaignId', async (req: Request, res: Response): Promise<void> => {
-  const triggered = await evaluateAlertRules(parseInt(req.params.campaignId));
+  const triggered = await evaluateAlertRules(parseInt(req.params.campaignId as string));
   res.json({ triggered: triggered.length, events: triggered });
 });
 
 // === Stats ===
 
 router.get('/stats/:campaignId', (req: Request, res: Response): void => {
-  res.json(getAlertStats(parseInt(req.params.campaignId)));
+  res.json(getAlertStats(parseInt(req.params.campaignId as string)));
 });
 
 export default router;

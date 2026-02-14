@@ -115,15 +115,15 @@ export async function generateReport(campaignId: number, type: 'weekly' | 'month
     topKeywords: keywords.slice(0, 10).map(k => ({
       keyword: k.keyword,
       qualityScore: k.qualityScore || 0,
-      avgCpc: k.maxCpc || k.avgCpc || 0,
+      avgCpc: k.maxCpc || 0,
       matchType: k.matchType,
       status: k.status,
     })),
     seoRankings: rankings.slice(0, 10).map(r => ({
       keyword: r.keyword,
-      position: r.position,
+      position: r.position ?? 0,
       previousPosition: r.previousPosition || 0,
-      searchVolume: r.searchVolume,
+      searchVolume: r.searchVolume ?? 0,
     })),
     summary,
     generatedAt: new Date().toISOString(),

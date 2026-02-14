@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import path from 'path';
 import { createServer } from 'http';
 import { Server as SocketIOServer } from 'socket.io';
 import { env } from './config/env.js';
@@ -55,6 +56,17 @@ app.use('/api/manage', manageRoutes);
 
 // Error handler
 app.use(errorHandler);
+
+// Serve client build in production (when not behind nginx)
+const clientDist = path.resolve(__dirname, '../../client/dist');
+app.use(express.static(clientDist));
+app.get('*', (_req, res, next) => {
+  // Only serve index.html for non-API routes
+  if (_req.path.startsWith('/api') || _req.path.startsWith('/socket.io')) return next();
+  res.sendFile(path.join(clientDist, 'index.html'), (err) => {
+    if (err) next(); // If client build doesn't exist, skip silently
+  });
+});
 
 // WebSocket connections
 io.on('connection', (socket) => {

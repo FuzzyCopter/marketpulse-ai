@@ -21,7 +21,7 @@ function optionalAuth(req: Request, res: Response, next: () => void): void {
 
 // GET /api/reports/:id/html — get report as HTML (for PDF/print)
 router.get('/:id/html', optionalAuth, (req: Request, res: Response): void => {
-  const report = getReport(req.params.id);
+  const report = getReport(req.params.id as string);
   if (!report) { res.status(404).json({ error: 'Report not found' }); return; }
   const html = generateReportHTML(report.data);
   res.setHeader('Content-Type', 'text/html');
@@ -30,7 +30,7 @@ router.get('/:id/html', optionalAuth, (req: Request, res: Response): void => {
 
 // GET /api/reports/preview/:campaignId — preview report
 router.get('/preview/:campaignId', optionalAuth, async (req: Request, res: Response): Promise<void> => {
-  const campaignId = parseInt(req.params.campaignId);
+  const campaignId = parseInt(req.params.campaignId as string);
   const type = (req.query.type as string) || 'weekly';
   const reportData = await generateReport(campaignId, type as 'weekly' | 'monthly' | 'campaign');
   const html = generateReportHTML(reportData);
@@ -57,7 +57,7 @@ router.post('/generate', async (req: Request, res: Response): Promise<void> => {
 
 // GET /api/reports/:id
 router.get('/:id', (req: Request, res: Response): void => {
-  const report = getReport(req.params.id);
+  const report = getReport(req.params.id as string);
   if (!report) { res.status(404).json({ error: 'Report not found' }); return; }
   res.json(report);
 });

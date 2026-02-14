@@ -1,6 +1,15 @@
 version: "3.8"
 
 services:
+  # Build React client → copy to shared volume for nginx
+  client-builder:
+    build:
+      context: .
+      dockerfile: packages/client/Dockerfile
+    container_name: mp-client-builder
+    volumes:
+      - client-build:/output
+
   nginx:
     image: nginx:1.25-alpine
     container_name: mp-nginx
@@ -11,6 +20,8 @@ services:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - client-build:/usr/share/nginx/html:ro
     depends_on:
+      client-builder:
+        condition: service_completed_successfully
       server:
         condition: service_healthy
     networks:
@@ -25,10 +36,15 @@ services:
     env_file: .env
     environment:
       - NODE_ENV=production
-      - DATABASE_URL=postgresql://mpuser:${DB_PASSWORD}@postgres:5432/marketpulse
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=marketpulse
+      - DB_USER=mpuser
+      - DB_PASSWORD=${DB_PASSWORD:-devpassword}
       - REDIS_URL=redis://redis:6379
       - DATA_SOURCE_MODE=mock
       - PORT=3001
+      - FRONTEND_URL=http://localhost
     ports:
       - "3001:3001"
     depends_on:

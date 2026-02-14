@@ -10,7 +10,7 @@ router.use(authMiddleware);
 
 // GET /api/ai/insights/:campaignId
 router.get('/insights/:campaignId', async (req: Request, res: Response): Promise<void> => {
-  const campaignId = parseInt(req.params.campaignId);
+  const campaignId = parseInt(req.params.campaignId as string);
   const type = (req.query.type as string) || 'performance';
 
   // Build analysis input from campaign data
@@ -69,7 +69,7 @@ router.get('/insights/:campaignId', async (req: Request, res: Response): Promise
 
 // POST /api/ai/refresh/:campaignId — force refresh cache
 router.post('/refresh/:campaignId', async (req: Request, res: Response): Promise<void> => {
-  const campaignId = parseInt(req.params.campaignId);
+  const campaignId = parseInt(req.params.campaignId as string);
   clearInsightCache(campaignId);
   res.json({ message: 'Cache cleared', campaignId });
 });

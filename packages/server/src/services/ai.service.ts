@@ -71,7 +71,7 @@ ${input.kpiProgress.map(k =>
 ).join('\n')}
 
 ${input.keywords ? `\nTop SEM Keywords:\n${input.keywords.slice(0, 10).map(k =>
-  `- "${k.keyword}" QS:${k.qualityScore} CPC:Rp${k.avgCpc} Match:${k.matchType}`
+  `- "${k.keyword}" QS:${k.qualityScore} CPC:Rp${(k.maxCpc || 0)} Match:${k.matchType}`
 ).join('\n')}` : ''}
 
 Berikan 3-5 insights dalam format JSON array:
@@ -95,7 +95,7 @@ ${input.kpiProgress.map(k =>
 
 Keywords:
 ${(input.keywords || []).map(k =>
-  `- "${k.keyword}" QS:${k.qualityScore} CPC:Rp${k.avgCpc} Status:${k.status} Match:${k.matchType}`
+  `- "${k.keyword}" QS:${k.qualityScore} CPC:Rp${(k.maxCpc || 0)} Status:${k.status} Match:${k.matchType}`
 ).join('\n')}
 
 Berikan rekomendasi optimasi spesifik dalam format JSON array:
@@ -167,7 +167,7 @@ function generateMockInsights(input: AIAnalysisInput, promptType: string): AIIns
     // SEM keyword analysis
     if (input.keywords && input.keywords.length > 0) {
       const lowQS = input.keywords.filter(k => (k.qualityScore || 0) < 7);
-      const highCPC = input.keywords.filter(k => k.avgCpc > 1500);
+      const highCPC = input.keywords.filter(k => (k.maxCpc || 0) > 1500);
 
       if (lowQS.length > 0) {
         insights.push({
@@ -187,7 +187,7 @@ function generateMockInsights(input: AIAnalysisInput, promptType: string): AIIns
       if (highCPC.length > 0) {
         insights.push({
           title: `${highCPC.length} Keyword CPC Tinggi`,
-          content: `Keyword dengan CPC di atas Rp 1.500: ${highCPC.map(k => `"${k.keyword}" (Rp${k.avgCpc.toLocaleString()})`).join(', ')}. Pertimbangkan untuk menurunkan bid atau pakai match type yang lebih specific.`,
+          content: `Keyword dengan CPC di atas Rp 1.500: ${highCPC.map(k => `"${k.keyword}" (Rp${(k.maxCpc || 0).toLocaleString()})`).join(', ')}. Pertimbangkan untuk menurunkan bid atau pakai match type yang lebih specific.`,
           severity: 'info',
           insightType: 'recommendation',
           actions: highCPC.map(k => ({

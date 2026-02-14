@@ -18,7 +18,7 @@ router.get('/rules', (req: Request, res: Response): void => {
 
 // GET /api/optimize/rules/:id
 router.get('/rules/:id', (req: Request, res: Response): void => {
-  const rule = getRule(parseInt(req.params.id));
+  const rule = getRule(parseInt(req.params.id as string));
   if (!rule) { res.status(404).json({ error: 'Rule not found' }); return; }
   res.json(rule);
 });
@@ -34,14 +34,14 @@ router.post('/rules', (req: Request, res: Response): void => {
 
 // PATCH /api/optimize/rules/:id
 router.patch('/rules/:id', (req: Request, res: Response): void => {
-  const updated = updateRule(parseInt(req.params.id), req.body);
+  const updated = updateRule(parseInt(req.params.id as string), req.body);
   if (!updated) { res.status(404).json({ error: 'Rule not found' }); return; }
   res.json(updated);
 });
 
 // DELETE /api/optimize/rules/:id
 router.delete('/rules/:id', (req: Request, res: Response): void => {
-  const deleted = deleteRule(parseInt(req.params.id));
+  const deleted = deleteRule(parseInt(req.params.id as string));
   if (!deleted) { res.status(404).json({ error: 'Rule not found' }); return; }
   res.json({ message: 'Rule deleted' });
 });
@@ -70,7 +70,7 @@ router.post('/execute', async (req: Request, res: Response): Promise<void> => {
 
 // POST /api/optimize/evaluate/:campaignId — run all rules
 router.post('/evaluate/:campaignId', async (req: Request, res: Response): Promise<void> => {
-  const campaignId = parseInt(req.params.campaignId);
+  const campaignId = parseInt(req.params.campaignId as string);
   const triggered = await evaluateRules(campaignId);
   res.json({ triggered: triggered.length, actions: triggered });
 });
@@ -95,7 +95,7 @@ router.get('/suggestions', (req: Request, res: Response): void => {
 // POST /api/optimize/suggestions/:id/apply — apply a suggestion
 router.post('/suggestions/:id/apply', async (req: Request, res: Response): Promise<void> => {
   const suggestions = getSuggestions();
-  const suggestion = suggestions.find(s => s.id === req.params.id);
+  const suggestion = suggestions.find(s => s.id === (req.params.id as string));
 
   if (!suggestion) {
     res.status(404).json({ error: 'Suggestion not found' });

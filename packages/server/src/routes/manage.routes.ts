@@ -69,7 +69,7 @@ router.post('/clients', authMiddleware, (req: Request, res: Response): void => {
 });
 
 router.patch('/clients/:id', authMiddleware, (req: Request, res: Response): void => {
-  const id = parseInt(req.params.id, 10);
+  const id = parseInt(req.params.id as string, 10);
   const client = clients.find(c => c.id === id);
   if (!client) {
     res.status(404).json({ error: 'Client not found' });
@@ -81,7 +81,7 @@ router.patch('/clients/:id', authMiddleware, (req: Request, res: Response): void
 });
 
 router.delete('/clients/:id', authMiddleware, (req: Request, res: Response): void => {
-  const id = parseInt(req.params.id, 10);
+  const id = parseInt(req.params.id as string, 10);
   if (id === 1) {
     res.status(400).json({ error: 'Cannot delete default client' });
     return;
@@ -156,7 +156,7 @@ router.post('/campaigns', authMiddleware, (req: Request, res: Response): void =>
 });
 
 router.patch('/campaigns/:id', authMiddleware, (req: Request, res: Response): void => {
-  const id = parseInt(req.params.id, 10);
+  const id = parseInt(req.params.id as string, 10);
   const campaign = managedCampaigns.find(c => c.id === id);
   if (!campaign) {
     res.status(404).json({ error: 'Campaign not found' });
@@ -182,7 +182,7 @@ router.patch('/campaigns/:id', authMiddleware, (req: Request, res: Response): vo
 });
 
 router.delete('/campaigns/:id', authMiddleware, (req: Request, res: Response): void => {
-  const id = parseInt(req.params.id, 10);
+  const id = parseInt(req.params.id as string, 10);
   const idx = managedCampaigns.findIndex(c => c.id === id);
   if (idx === -1) {
     res.status(404).json({ error: 'Campaign not found' });

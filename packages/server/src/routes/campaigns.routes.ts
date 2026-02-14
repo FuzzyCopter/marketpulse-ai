@@ -41,7 +41,7 @@ router.get('/', authMiddleware, (_req: Request, res: Response): void => {
 });
 
 router.get('/:id', authMiddleware, (req: Request, res: Response): void => {
-  const id = parseInt(req.params.id, 10);
+  const id = parseInt(req.params.id as string, 10);
   const campaign = CAMPAIGNS.find(c => c.id === id);
 
   if (!campaign) {
@@ -57,7 +57,7 @@ router.get('/:id', authMiddleware, (req: Request, res: Response): void => {
 });
 
 router.get('/:id/metrics', authMiddleware, async (req: Request, res: Response): Promise<void> => {
-  const campaignId = parseInt(req.params.id, 10);
+  const campaignId = parseInt(req.params.id as string, 10);
   const channel = req.query.channel as string | undefined;
   const startDate = req.query.startDate as string | undefined;
   const endDate = req.query.endDate as string | undefined;

@@ -158,9 +158,9 @@ export async function executeAction(
     const keywords = await provider.getKeywords(campaignId);
     const keyword = keywords.find(k => k.keyword === target || k.id === Number(target));
     if (keyword) {
-      previousValue.cpc = keyword.avgCpc;
+      previousValue.cpc = keyword.maxCpc || 0;
       const adjustPct = (params.adjustPercent as number) || 0;
-      const newBid = (params.newBid as number) || Math.round(keyword.avgCpc * (1 + adjustPct / 100));
+      const newBid = (params.newBid as number) || Math.round((keyword.maxCpc || 0) * (1 + adjustPct / 100));
       newValue.cpc = newBid;
     }
   } else if (actionType === 'pause_keyword') {
@@ -224,7 +224,7 @@ export async function evaluateRules(campaignId: number): Promise<ActionLog[]> {
       }
     } else if (rule.metric === 'cpc') {
       for (const kw of keywords) {
-        const value = kw.avgCpc;
+        const value = kw.maxCpc || 0;
         if (rule.condition === 'above' && value > rule.threshold) {
           const action = await executeAction(
             campaignId,

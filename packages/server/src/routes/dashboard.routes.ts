@@ -64,7 +64,7 @@ router.get('/overview', authMiddleware, async (_req: Request, res: Response): Pr
 });
 
 router.get('/campaign/:id', authMiddleware, async (req: Request, res: Response): Promise<void> => {
-  const campaignId = parseInt(req.params.id, 10);
+  const campaignId = parseInt(req.params.id as string, 10);
   const camp = CAMPAIGNS.find(c => c.id === campaignId);
 
   if (!camp) {

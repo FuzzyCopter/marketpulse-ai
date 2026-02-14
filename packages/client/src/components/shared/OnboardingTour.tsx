@@ -118,7 +118,7 @@ export default function OnboardingTour() {
   const [spotlight, setSpotlight] = useState<DOMRect | null>(null);
   const [tooltipStyle, setTooltipStyle] = useState<React.CSSProperties>({});
   const [mobile, setMobile] = useState(isMobile());
-  const retryRef = useRef<ReturnType<typeof setTimeout>>();
+  const retryRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   useEffect(() => {
     const done = localStorage.getItem(STORAGE_KEY);
@@ -312,33 +312,36 @@ export default function OnboardingTour() {
 
   return (
     <div className="fixed inset-0 z-[100]" style={{ pointerEvents: 'none' }}>
-      {/* Overlay — 4 rectangles around spotlight so the highlighted element stays clickable */}
+      {/* Overlay — clip-path cuts a hole so the highlighted element stays clickable */}
       {isCenter ? (
         <div
           className="absolute inset-0 bg-black/60 backdrop-blur-sm"
           style={{ pointerEvents: 'auto' }}
-          onClick={closeTour}
         />
       ) : spotlight ? (() => {
         const pad = 6;
-        const sTop = spotlight.top - pad;
-        const sLeft = spotlight.left - pad;
-        const sW = spotlight.width + pad * 2;
-        const sH = spotlight.height + pad * 2;
+        const hL = spotlight.left - pad;
+        const hT = spotlight.top - pad;
+        const hR = spotlight.left + spotlight.width + pad;
+        const hB = spotlight.top + spotlight.height + pad;
         const vw = window.innerWidth;
         const vh = window.innerHeight;
-        const overlayColor = 'rgba(0,0,0,0.55)';
 
         return (
           <>
-            {/* Top overlay */}
-            <div style={{ position: 'fixed', top: 0, left: 0, width: vw, height: Math.max(0, sTop), background: overlayColor, pointerEvents: 'auto' }} onClick={closeTour} />
-            {/* Bottom overlay */}
-            <div style={{ position: 'fixed', top: sTop + sH, left: 0, width: vw, height: Math.max(0, vh - sTop - sH), background: overlayColor, pointerEvents: 'auto' }} onClick={closeTour} />
-            {/* Left overlay */}
-            <div style={{ position: 'fixed', top: sTop, left: 0, width: Math.max(0, sLeft), height: sH, background: overlayColor, pointerEvents: 'auto' }} onClick={closeTour} />
-            {/* Right overlay */}
-            <div style={{ position: 'fixed', top: sTop, left: sLeft + sW, width: Math.max(0, vw - sLeft - sW), height: sH, background: overlayColor, pointerEvents: 'auto' }} onClick={closeTour} />
+            {/* Single overlay with clip-path hole — clicks pass through the hole to elements below */}
+            <div
+              style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                width: vw,
+                height: vh,
+                background: 'rgba(0,0,0,0.55)',
+                pointerEvents: 'auto',
+                clipPath: `path(evenodd, "M 0 0 H ${vw} V ${vh} H 0 Z M ${hL} ${hT} H ${hR} V ${hB} H ${hL} Z")`,
+              }}
+            />
             {/* Pulse ring around spotlight — no pointer events */}
             <div
               className="absolute rounded-xl border-2 border-blue-400 animate-pulse"
