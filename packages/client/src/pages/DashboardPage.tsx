@@ -88,7 +88,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Today's Quick Metrics */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4" data-tour="quick-metrics">
         {quickMetrics.map(({ title, value, icon: Icon, color, bgLight, isCurrency }, idx) => (
           <div
             key={title}
@@ -110,7 +110,9 @@ export default function DashboardPage() {
       </div>
 
       {/* KPI Progress */}
-      <KPISection kpis={kpis} daysElapsed={campaign.daysElapsed} totalDays={campaign.totalDays} />
+      <div data-tour="kpi-section">
+        <KPISection kpis={kpis} daysElapsed={campaign.daysElapsed} totalDays={campaign.totalDays} />
+      </div>
 
       {/* Charts & Channel Breakdown */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

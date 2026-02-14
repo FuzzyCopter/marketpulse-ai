@@ -76,7 +76,7 @@ export default function ReportsPage() {
       </div>
 
       {/* Generate Report Card */}
-      <div className="bg-white rounded-xl border border-gray-200 p-5">
+      <div className="bg-white rounded-xl border border-gray-200 p-5" data-tour="report-generator">
         <h3 className="text-lg font-semibold text-gray-800 mb-4">Generate New Report</h3>
         <p className="text-sm text-gray-500 mb-4">
           Generate Honda campaign report. Report bisa di-print atau save as PDF langsung dari browser.

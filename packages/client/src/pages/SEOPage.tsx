@@ -65,7 +65,7 @@ export default function SEOPage() {
       <h1 className="text-2xl font-bold text-gray-900">SEO - Organic Rankings</h1>
 
       {/* Rankings Table */}
-      <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-5">
+      <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-5" data-tour="seo-rankings">
         <h3 className="text-lg font-semibold text-gray-800 mb-4">Keyword Rankings</h3>
         <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
         <table className="w-full text-sm min-w-[500px]">

@@ -19,7 +19,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
           <Menu size={20} />
         </button>
 
-        <div className="relative">
+        <div className="relative" data-tour="campaign-selector">
           <select
             value={activeCampaignId}
             onChange={(e) => setActiveCampaign(Number(e.target.value))}

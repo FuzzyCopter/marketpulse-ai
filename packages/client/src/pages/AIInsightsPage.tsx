@@ -94,6 +94,7 @@ export default function AIInsightsPage() {
         </div>
         <button
           onClick={refreshInsights}
+          data-tour="ai-refresh"
           className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg text-sm hover:bg-purple-700 transition-colors w-fit"
         >
           <RefreshCw className="w-4 h-4" />

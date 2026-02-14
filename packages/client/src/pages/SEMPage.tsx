@@ -51,7 +51,7 @@ export default function SEMPage() {
       <h1 className="text-2xl font-bold text-gray-900">SEM - Google Search Ads</h1>
 
       {/* Keywords Table */}
-      <div className="bg-white rounded-xl border border-gray-200 p-5">
+      <div className="bg-white rounded-xl border border-gray-200 p-5" data-tour="sem-keywords">
         <h3 className="text-lg font-semibold text-gray-800 mb-4">Keywords ({keywords.length})</h3>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">

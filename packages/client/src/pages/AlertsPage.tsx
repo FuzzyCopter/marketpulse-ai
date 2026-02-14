@@ -139,7 +139,7 @@ export default function AlertsPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3" data-tour="alert-tabs">
         <div className="flex gap-2">
           <button
             onClick={() => setActiveTab('events')}
