@@ -12,6 +12,7 @@ import AlertsPage from './pages/AlertsPage';
 import SettingsPage from './pages/SettingsPage';
 import AIInsightsPage from './pages/AIInsightsPage';
 import AutoOptimizePage from './pages/AutoOptimizePage';
+import ManagePage from './pages/ManagePage';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useAuthStore();
@@ -86,6 +87,7 @@ export default function App() {
             <Route path="/ai-insights" element={<AIInsightsPage />} />
             <Route path="/auto-optimize" element={<AutoOptimizePage />} />
             <Route path="/alerts" element={<AlertsPage />} />
+            <Route path="/manage" element={<ManagePage />} />
             <Route path="/settings" element={<SettingsPage />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />

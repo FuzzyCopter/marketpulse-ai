@@ -13,6 +13,7 @@ import aiRoutes from './routes/ai.routes.js';
 import optimizeRoutes from './routes/optimize.routes.js';
 import alertsRoutes from './routes/alerts.routes.js';
 import reportsRoutes from './routes/reports.routes.js';
+import manageRoutes from './routes/manage.routes.js';
 import { getDataSourceMode } from './datasources/index.js';
 
 const app = express();
@@ -50,6 +51,7 @@ app.use('/api/ai', aiRoutes);
 app.use('/api/optimize', optimizeRoutes);
 app.use('/api/alerts', alertsRoutes);
 app.use('/api/reports', reportsRoutes);
+app.use('/api/manage', manageRoutes);
 
 // Error handler
 app.use(errorHandler);

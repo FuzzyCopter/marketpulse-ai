@@ -3,6 +3,7 @@ import { HONDA_CAMPAIGNS, CHANNEL_LABELS } from '@marketpulse/shared';
 import type { KPIProgress, ChannelMetrics, DashboardOverview } from '@marketpulse/shared';
 import { authMiddleware } from '../middleware/auth.js';
 import { getSearchAdsProvider, getDiscoveryAdsProvider, getSocialMediaProvider } from '../datasources/index.js';
+import { getManagedCampaigns } from './manage.routes.js';
 
 const router = Router();
 
@@ -42,6 +43,20 @@ router.get('/overview', authMiddleware, async (_req: Request, res: Response): Pr
       endDate: camp.endDate,
       totalDays: camp.totalDays,
       daysElapsed: getDaysElapsed(camp.startDate, camp.endDate),
+    });
+  }
+
+  // Include user-created campaigns
+  for (const mc of getManagedCampaigns()) {
+    overviews.push({
+      id: mc.id,
+      name: mc.name,
+      slug: mc.slug,
+      status: getCampaignStatus(mc.startDate, mc.endDate),
+      startDate: mc.startDate,
+      endDate: mc.endDate,
+      totalDays: mc.totalDays,
+      daysElapsed: getDaysElapsed(mc.startDate, mc.endDate),
     });
   }
 

@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Search, TrendingUp, FileText, Bell, Settings, LogOut, Brain, Zap, X, BarChart3 } from 'lucide-react';
+import { LayoutDashboard, Search, TrendingUp, FileText, Bell, Settings, LogOut, Brain, Zap, X, BarChart3, Briefcase } from 'lucide-react';
 import { useAuthStore } from '../../store/auth.store';
 
 const navItems = [
@@ -10,6 +10,7 @@ const navItems = [
   { to: '/auto-optimize', icon: Zap, label: 'Auto-Optimize' },
   { to: '/reports', icon: FileText, label: 'Reports' },
   { to: '/alerts', icon: Bell, label: 'Alerts' },
+  { to: '/manage', icon: Briefcase, label: 'Manage' },
   { to: '/settings', icon: Settings, label: 'Settings' },
 ];
 

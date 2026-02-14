@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import { HONDA_CAMPAIGNS, CHANNEL_LABELS } from '@marketpulse/shared';
 import { authMiddleware } from '../middleware/auth.js';
 import { getSearchAdsProvider, getDiscoveryAdsProvider, getSocialMediaProvider } from '../datasources/index.js';
+import { getManagedCampaigns } from './manage.routes.js';
 
 const router = Router();
 
@@ -11,17 +12,31 @@ const CAMPAIGNS = [
 ];
 
 router.get('/', authMiddleware, (_req: Request, res: Response): void => {
+  const managed = getManagedCampaigns().map(c => ({
+    id: c.id,
+    name: c.name,
+    slug: c.slug,
+    client: c.clientName,
+    startDate: c.startDate,
+    endDate: c.endDate,
+    totalDays: c.totalDays,
+    status: getStatus(c.startDate, c.endDate),
+  }));
+
   res.json({
-    campaigns: CAMPAIGNS.map(c => ({
-      id: c.id,
-      name: c.name,
-      slug: c.slug,
-      client: c.client,
-      startDate: c.startDate,
-      endDate: c.endDate,
-      totalDays: c.totalDays,
-      status: getStatus(c.startDate, c.endDate),
-    })),
+    campaigns: [
+      ...CAMPAIGNS.map(c => ({
+        id: c.id,
+        name: c.name,
+        slug: c.slug,
+        client: c.client,
+        startDate: c.startDate,
+        endDate: c.endDate,
+        totalDays: c.totalDays,
+        status: getStatus(c.startDate, c.endDate),
+      })),
+      ...managed,
+    ],
   });
 });
 
