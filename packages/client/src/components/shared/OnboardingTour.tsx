@@ -68,7 +68,7 @@ const tourSteps: TourStep[] = [
     route: '/ai-insights',
     target: 'ai-refresh',
     title: 'AI Insights',
-    description: 'Klik Refresh Analysis untuk minta Claude AI analisa data campaign. Ada Performance Analysis & Optimization Suggestions.',
+    description: 'Klik Refresh Analysis untuk minta AI analisa data campaign. Ada Performance Analysis & Optimization Suggestions.',
     position: 'bottom',
     action: 'Generate AI insights baru',
   },

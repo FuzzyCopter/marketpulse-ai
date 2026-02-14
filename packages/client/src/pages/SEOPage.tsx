@@ -36,7 +36,7 @@ export default function SEOPage() {
   useEffect(() => {
     async function load() {
       const [rankRes, pageRes, issueRes] = await Promise.all([
-        api.get(`/seo/campaigns/${activeCampaignId}/rankings?startDate=2026-02-13&endDate=2026-02-13`),
+        api.get(`/seo/campaigns/${activeCampaignId}/rankings`),
         api.get(`/seo/campaigns/${activeCampaignId}/pages`),
         api.get(`/seo/campaigns/${activeCampaignId}/technical`),
       ]);

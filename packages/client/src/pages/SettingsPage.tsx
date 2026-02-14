@@ -176,7 +176,7 @@ export default function SettingsPage() {
             { name: 'Google Search Console', desc: 'Connect GSC untuk SEO ranking data', icon: '🌐', bg: 'bg-green-50', border: 'border-green-200' },
             { name: 'Meta Ads', desc: 'Connect Facebook & Instagram Ads', icon: '📱', bg: 'bg-indigo-50', border: 'border-indigo-200' },
             { name: 'TikTok Ads', desc: 'Connect TikTok Ads Manager', icon: '🎵', bg: 'bg-pink-50', border: 'border-pink-200' },
-            { name: 'Claude AI (Anthropic)', desc: 'API key untuk AI insights & analysis', icon: '🤖', bg: 'bg-purple-50', border: 'border-purple-200' },
+            { name: 'OpenAI', desc: 'API key untuk AI insights & analysis', icon: '🤖', bg: 'bg-purple-50', border: 'border-purple-200' },
           ].map(({ name, desc, icon, bg, border }) => (
             <div key={name} className={`bg-white rounded-2xl border border-gray-200 p-5 flex items-center justify-between hover:shadow-md transition-shadow`}>
               <div className="flex items-center gap-4">
