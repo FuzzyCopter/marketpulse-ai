@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAuthStore } from '../store/auth.store';
-import { Settings, User, Database, Shield, Bell, Plug, Save, Check } from 'lucide-react';
+import { Settings, User, Database, Shield, Bell, Plug, Save, Check, RotateCcw } from 'lucide-react';
+import { resetOnboardingTour } from '../components/shared/OnboardingTour';
 
 export default function SettingsPage() {
   const { user } = useAuthStore();
@@ -246,6 +247,18 @@ export default function SettingsPage() {
                 </div>
               ))}
             </div>
+          </div>
+
+          <div className="bg-white rounded-2xl border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">Onboarding</h3>
+            <p className="text-sm text-gray-500 mb-4">Tampilkan kembali tour walkthrough yang menjelaskan semua fitur MarketPulse AI.</p>
+            <button
+              onClick={() => { resetOnboardingTour(); window.location.reload(); }}
+              className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-medium hover:bg-indigo-700 transition-colors"
+            >
+              <RotateCcw size={16} />
+              Restart Tour
+            </button>
           </div>
 
           <div className="bg-gradient-to-r from-gray-800 to-gray-900 rounded-2xl p-6 text-white">

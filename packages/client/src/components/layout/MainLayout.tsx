@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
+import OnboardingTour from '../shared/OnboardingTour';
 
 export default function MainLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -15,6 +16,7 @@ export default function MainLayout() {
           <Outlet />
         </main>
       </div>
+      <OnboardingTour />
     </div>
   );
 }
