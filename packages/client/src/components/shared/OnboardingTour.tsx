@@ -312,45 +312,47 @@ export default function OnboardingTour() {
 
   return (
     <div className="fixed inset-0 z-[100]" style={{ pointerEvents: 'none' }}>
-      {/* Overlay */}
+      {/* Overlay — 4 rectangles around spotlight so the highlighted element stays clickable */}
       {isCenter ? (
         <div
           className="absolute inset-0 bg-black/60 backdrop-blur-sm"
           style={{ pointerEvents: 'auto' }}
           onClick={closeTour}
         />
-      ) : spotlight ? (
-        <>
-          <div
-            className="absolute inset-0"
-            style={{ pointerEvents: 'auto' }}
-            onClick={closeTour}
-          />
-          {/* Spotlight hole */}
-          <div
-            className="absolute transition-all duration-500 ease-out rounded-xl"
-            style={{
-              top: spotlight.top - 6,
-              left: spotlight.left - 6,
-              width: spotlight.width + 12,
-              height: spotlight.height + 12,
-              boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.55)',
-              pointerEvents: 'none',
-            }}
-          />
-          {/* Pulse ring */}
-          <div
-            className="absolute rounded-xl border-2 border-blue-400 animate-pulse"
-            style={{
-              top: spotlight.top - 8,
-              left: spotlight.left - 8,
-              width: spotlight.width + 16,
-              height: spotlight.height + 16,
-              pointerEvents: 'none',
-            }}
-          />
-        </>
-      ) : (
+      ) : spotlight ? (() => {
+        const pad = 6;
+        const sTop = spotlight.top - pad;
+        const sLeft = spotlight.left - pad;
+        const sW = spotlight.width + pad * 2;
+        const sH = spotlight.height + pad * 2;
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+        const overlayColor = 'rgba(0,0,0,0.55)';
+
+        return (
+          <>
+            {/* Top overlay */}
+            <div style={{ position: 'fixed', top: 0, left: 0, width: vw, height: Math.max(0, sTop), background: overlayColor, pointerEvents: 'auto' }} onClick={closeTour} />
+            {/* Bottom overlay */}
+            <div style={{ position: 'fixed', top: sTop + sH, left: 0, width: vw, height: Math.max(0, vh - sTop - sH), background: overlayColor, pointerEvents: 'auto' }} onClick={closeTour} />
+            {/* Left overlay */}
+            <div style={{ position: 'fixed', top: sTop, left: 0, width: Math.max(0, sLeft), height: sH, background: overlayColor, pointerEvents: 'auto' }} onClick={closeTour} />
+            {/* Right overlay */}
+            <div style={{ position: 'fixed', top: sTop, left: sLeft + sW, width: Math.max(0, vw - sLeft - sW), height: sH, background: overlayColor, pointerEvents: 'auto' }} onClick={closeTour} />
+            {/* Pulse ring around spotlight — no pointer events */}
+            <div
+              className="absolute rounded-xl border-2 border-blue-400 animate-pulse"
+              style={{
+                top: spotlight.top - 8,
+                left: spotlight.left - 8,
+                width: spotlight.width + 16,
+                height: spotlight.height + 16,
+                pointerEvents: 'none',
+              }}
+            />
+          </>
+        );
+      })() : (
         <div className="absolute inset-0 bg-black/40" style={{ pointerEvents: 'auto' }} />
       )}
 
