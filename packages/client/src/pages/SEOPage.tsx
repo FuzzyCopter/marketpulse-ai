@@ -65,9 +65,10 @@ export default function SEOPage() {
       <h1 className="text-2xl font-bold text-gray-900">SEO - Organic Rankings</h1>
 
       {/* Rankings Table */}
-      <div className="bg-white rounded-xl border border-gray-200 p-5">
+      <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-5">
         <h3 className="text-lg font-semibold text-gray-800 mb-4">Keyword Rankings</h3>
-        <table className="w-full text-sm">
+        <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
+        <table className="w-full text-sm min-w-[500px]">
           <thead>
             <tr className="border-b border-gray-100">
               <th className="text-left py-3 px-2 text-gray-500 font-medium">Keyword</th>
@@ -108,6 +109,7 @@ export default function SEOPage() {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
 
       {/* Page Audits */}

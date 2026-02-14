@@ -132,7 +132,7 @@ export default function AutoOptimizePage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <Zap className="w-7 h-7 text-orange-500" />
           <h1 className="text-2xl font-bold text-gray-900">Auto-Optimize</h1>
@@ -187,8 +187,8 @@ export default function AutoOptimizePage() {
       {showNewRule && (
         <div className="bg-white rounded-xl border border-gray-200 p-5">
           <h3 className="text-lg font-semibold text-gray-800 mb-4">Create New Rule</h3>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="col-span-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="sm:col-span-2">
               <label className="block text-sm text-gray-600 mb-1">Rule Name</label>
               <input
                 type="text"
@@ -198,7 +198,7 @@ export default function AutoOptimizePage() {
                 placeholder="e.g. CPC Terlalu Tinggi"
               />
             </div>
-            <div className="col-span-2">
+            <div className="sm:col-span-2">
               <label className="block text-sm text-gray-600 mb-1">Description</label>
               <input
                 type="text"
@@ -253,7 +253,7 @@ export default function AutoOptimizePage() {
                 ))}
               </select>
             </div>
-            <div className="col-span-2 flex gap-2 justify-end">
+            <div className="sm:col-span-2 flex gap-2 justify-end">
               <button
                 onClick={() => setShowNewRule(false)}
                 className="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg text-sm hover:bg-gray-200"
@@ -306,7 +306,7 @@ export default function AutoOptimizePage() {
               {expandedRule === rule.id && (
                 <div className="px-4 pb-4 border-t border-gray-100 pt-3">
                   <p className="text-sm text-gray-600 mb-3">{rule.description}</p>
-                  <div className="grid grid-cols-3 gap-3 text-sm mb-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm mb-3">
                     <div>
                       <p className="text-gray-400">Lookback</p>
                       <p className="font-medium">{rule.lookbackDays} days</p>
@@ -343,14 +343,14 @@ export default function AutoOptimizePage() {
 
       {/* Action History */}
       {activeTab === 'history' && (
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden overflow-x-auto">
           {logs.length === 0 ? (
             <div className="p-8 text-center">
               <History className="w-12 h-12 text-gray-300 mx-auto mb-3" />
               <p className="text-gray-500">Belum ada action yang dijalankan</p>
             </div>
           ) : (
-            <table className="w-full">
+            <table className="w-full min-w-[600px]">
               <thead className="bg-gray-50">
                 <tr>
                   <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Time</th>

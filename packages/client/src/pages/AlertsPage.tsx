@@ -123,18 +123,15 @@ export default function AlertsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <Bell className="w-7 h-7 text-red-500" />
           <h1 className="text-2xl font-bold text-gray-900">Alerts</h1>
-        </div>
-        <div className="flex items-center gap-3">
-          {/* Stats badges */}
           <div className="flex gap-2">
-            <span className="bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm font-medium">
+            <span className="bg-red-100 text-red-700 px-2.5 py-0.5 rounded-full text-xs font-medium">
               {stats.unacknowledged} unread
             </span>
-            <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-sm font-medium">
+            <span className="bg-gray-100 text-gray-600 px-2.5 py-0.5 rounded-full text-xs font-medium">
               {stats.total} total
             </span>
           </div>
@@ -142,7 +139,7 @@ export default function AlertsPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex gap-2">
           <button
             onClick={() => setActiveTab('events')}
@@ -250,8 +247,8 @@ export default function AlertsPage() {
                   <X className="w-4 h-4" />
                 </button>
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="col-span-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="sm:col-span-2">
                   <label className="block text-sm text-gray-600 mb-1">Name</label>
                   <input
                     type="text" value={newRule.name}
@@ -288,7 +285,7 @@ export default function AlertsPage() {
                     onChange={(e) => setNewRule({ ...newRule, threshold: parseFloat(e.target.value) })}
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
                 </div>
-                <div className="col-span-2 flex justify-end gap-2">
+                <div className="sm:col-span-2 flex justify-end gap-2">
                   <button onClick={() => setShowNewRule(false)} className="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg text-sm">Cancel</button>
                   <button onClick={createRuleHandler} disabled={!newRule.name}
                     className="px-4 py-2 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600 disabled:opacity-50">Create</button>

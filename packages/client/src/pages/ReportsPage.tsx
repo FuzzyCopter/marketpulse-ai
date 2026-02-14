@@ -81,11 +81,11 @@ export default function ReportsPage() {
         <p className="text-sm text-gray-500 mb-4">
           Generate Honda campaign report. Report bisa di-print atau save as PDF langsung dari browser.
         </p>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
           <select
             value={reportType}
             onChange={(e) => setReportType(e.target.value as 'weekly' | 'monthly' | 'campaign')}
-            className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+            className="border border-gray-300 rounded-lg px-3 py-2 text-sm w-full sm:w-auto"
           >
             <option value="weekly">Weekly Report</option>
             <option value="monthly">Monthly Report</option>
@@ -94,7 +94,7 @@ export default function ReportsPage() {
           <button
             onClick={generateReport}
             disabled={generating}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 w-full sm:w-auto justify-center"
           >
             {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
             {generating ? 'Generating...' : 'Generate Report'}
@@ -114,7 +114,7 @@ export default function ReportsPage() {
             <p className="text-sm text-blue-800">{selectedReport.data.summary}</p>
           </div>
 
-          <div className="grid grid-cols-3 gap-3 mb-4">
+          <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-4">
             <div className="text-center p-3 bg-gray-50 rounded-lg">
               <p className="text-2xl font-bold text-gray-900">{selectedReport.data.campaign.daysElapsed}/{selectedReport.data.campaign.totalDays}</p>
               <p className="text-xs text-gray-500">Days</p>
@@ -132,7 +132,8 @@ export default function ReportsPage() {
           </div>
 
           {/* KPI Table */}
-          <table className="w-full mb-4">
+          <div className="overflow-x-auto -mx-5 px-5">
+          <table className="w-full mb-4 min-w-[400px]">
             <thead>
               <tr className="bg-gray-50">
                 <th className="text-left px-3 py-2 text-xs font-medium text-gray-500">Channel</th>
@@ -156,8 +157,9 @@ export default function ReportsPage() {
               ))}
             </tbody>
           </table>
+          </div>
 
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <button onClick={() => viewHTML(selectedReport.id)} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700">
               <Eye className="w-4 h-4" /> View Full Report
             </button>

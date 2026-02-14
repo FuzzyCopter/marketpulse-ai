@@ -87,14 +87,14 @@ export default function AIInsightsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <Brain className="w-7 h-7 text-purple-600" />
           <h1 className="text-2xl font-bold text-gray-900">AI Insights</h1>
         </div>
         <button
           onClick={refreshInsights}
-          className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg text-sm hover:bg-purple-700 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg text-sm hover:bg-purple-700 transition-colors w-fit"
         >
           <RefreshCw className="w-4 h-4" />
           Refresh Analysis
