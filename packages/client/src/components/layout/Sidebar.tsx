@@ -1,11 +1,13 @@
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Search, TrendingUp, FileText, Bell, Settings, LogOut } from 'lucide-react';
+import { LayoutDashboard, Search, TrendingUp, FileText, Bell, Settings, LogOut, Brain, Zap } from 'lucide-react';
 import { useAuthStore } from '../../store/auth.store';
 
 const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/sem', icon: Search, label: 'SEM' },
   { to: '/seo', icon: TrendingUp, label: 'SEO' },
+  { to: '/ai-insights', icon: Brain, label: 'AI Insights' },
+  { to: '/auto-optimize', icon: Zap, label: 'Auto-Optimize' },
   { to: '/reports', icon: FileText, label: 'Reports' },
   { to: '/alerts', icon: Bell, label: 'Alerts' },
   { to: '/settings', icon: Settings, label: 'Settings' },

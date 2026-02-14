@@ -9,6 +9,10 @@ import dashboardRoutes from './routes/dashboard.routes.js';
 import campaignsRoutes from './routes/campaigns.routes.js';
 import semRoutes from './routes/sem.routes.js';
 import seoRoutes from './routes/seo.routes.js';
+import aiRoutes from './routes/ai.routes.js';
+import optimizeRoutes from './routes/optimize.routes.js';
+import alertsRoutes from './routes/alerts.routes.js';
+import reportsRoutes from './routes/reports.routes.js';
 import { getDataSourceMode } from './datasources/index.js';
 
 const app = express();
@@ -42,6 +46,10 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/campaigns', campaignsRoutes);
 app.use('/api/sem', semRoutes);
 app.use('/api/seo', seoRoutes);
+app.use('/api/ai', aiRoutes);
+app.use('/api/optimize', optimizeRoutes);
+app.use('/api/alerts', alertsRoutes);
+app.use('/api/reports', reportsRoutes);
 
 // Error handler
 app.use(errorHandler);

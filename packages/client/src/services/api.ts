@@ -14,25 +14,36 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Handle 401 responses
+// Handle 401 responses — refresh token or clear auth state (no hard redirects)
+let isRefreshing = false;
+
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    if (error.response?.status === 401) {
+    const originalRequest = error.config;
+
+    // Don't retry auth endpoints to avoid loops
+    if (originalRequest?.url?.includes('/auth/')) {
+      return Promise.reject(error);
+    }
+
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
       const refreshToken = localStorage.getItem('mp_refresh_token');
-      if (refreshToken) {
+
+      if (refreshToken && !isRefreshing) {
+        isRefreshing = true;
         try {
           const { data } = await axios.post('/api/auth/refresh', { refreshToken });
           localStorage.setItem('mp_access_token', data.accessToken);
-          error.config.headers.Authorization = `Bearer ${data.accessToken}`;
-          return api.request(error.config);
+          isRefreshing = false;
+          originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
+          return api.request(originalRequest);
         } catch {
+          isRefreshing = false;
           localStorage.removeItem('mp_access_token');
           localStorage.removeItem('mp_refresh_token');
-          window.location.href = '/login';
         }
-      } else {
-        window.location.href = '/login';
       }
     }
     return Promise.reject(error);

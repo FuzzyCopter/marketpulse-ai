@@ -10,6 +10,8 @@ import SEOPage from './pages/SEOPage';
 import ReportsPage from './pages/ReportsPage';
 import AlertsPage from './pages/AlertsPage';
 import SettingsPage from './pages/SettingsPage';
+import AIInsightsPage from './pages/AIInsightsPage';
+import AutoOptimizePage from './pages/AutoOptimizePage';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useAuthStore();
@@ -26,19 +28,40 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+function GuestRoute({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated, isLoading } = useAuthStore();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full" />
+      </div>
+    );
+  }
+
+  if (isAuthenticated) return <Navigate to="/" replace />;
+  return <>{children}</>;
+}
+
 function AppInit({ children }: { children: React.ReactNode }) {
-  const { checkAuth, isAuthenticated } = useAuthStore();
+  const { checkAuth, isAuthenticated, isLoading } = useAuthStore();
   const { fetchCampaigns } = useCampaignStore();
 
   useEffect(() => {
-    checkAuth();
+    const token = localStorage.getItem('mp_access_token');
+    if (token) {
+      checkAuth();
+    } else {
+      // No token — skip API call, just mark as not loading
+      useAuthStore.setState({ isLoading: false });
+    }
   }, [checkAuth]);
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && !isLoading) {
       fetchCampaigns();
     }
-  }, [isAuthenticated, fetchCampaigns]);
+  }, [isAuthenticated, isLoading, fetchCampaigns]);
 
   return <>{children}</>;
 }
@@ -48,7 +71,7 @@ export default function App() {
     <BrowserRouter>
       <AppInit>
         <Routes>
-          <Route path="/login" element={<LoginPage />} />
+          <Route path="/login" element={<GuestRoute><LoginPage /></GuestRoute>} />
           <Route
             element={
               <ProtectedRoute>
@@ -60,6 +83,8 @@ export default function App() {
             <Route path="/sem" element={<SEMPage />} />
             <Route path="/seo" element={<SEOPage />} />
             <Route path="/reports" element={<ReportsPage />} />
+            <Route path="/ai-insights" element={<AIInsightsPage />} />
+            <Route path="/auto-optimize" element={<AutoOptimizePage />} />
             <Route path="/alerts" element={<AlertsPage />} />
             <Route path="/settings" element={<SettingsPage />} />
           </Route>
