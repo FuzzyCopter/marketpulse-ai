@@ -1,4 +1,4 @@
-import Anthropic from '@anthropic-ai/sdk';
+import OpenAI from 'openai';
 import { env } from '../config/env.js';
 import type { DashboardOverview, SEMKeyword, SEORanking } from '@marketpulse/shared';
 
@@ -46,9 +46,9 @@ function getCacheKey(campaignId: number, type: string): string {
   return `${campaignId}:${type}:${dateKey}`;
 }
 
-// === Claude AI Integration ===
-async function analyzeWithClaude(input: AIAnalysisInput, promptType: string): Promise<AIInsightResult[]> {
-  const client = new Anthropic({ apiKey: env.anthropicApiKey });
+// === OpenAI Integration ===
+async function analyzeWithAI(input: AIAnalysisInput, promptType: string): Promise<AIInsightResult[]> {
+  const client = new OpenAI({ apiKey: env.openaiApiKey });
 
   const systemPrompt = `Kamu adalah AI analyst untuk digital marketing agency bernama Manna Digital.
 Kamu menganalisa campaign performance untuk Honda Indonesia.
@@ -108,14 +108,16 @@ Berikan rekomendasi optimasi spesifik dalam format JSON array:
 }]`;
   }
 
-  const response = await client.messages.create({
-    model: 'claude-sonnet-4-5-20250929',
+  const response = await client.chat.completions.create({
+    model: 'gpt-4o-mini',
     max_tokens: 2000,
-    system: systemPrompt,
-    messages: [{ role: 'user', content: userPrompt }],
+    messages: [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userPrompt },
+    ],
   });
 
-  const text = response.content[0].type === 'text' ? response.content[0].text : '';
+  const text = response.choices[0]?.message?.content || '';
 
   // Extract JSON from response
   const jsonMatch = text.match(/\[[\s\S]*\]/);
@@ -267,11 +269,11 @@ export async function getAIInsights(
 
   let insights: AIInsightResult[];
 
-  if (env.anthropicApiKey) {
+  if (env.openaiApiKey) {
     try {
-      insights = await analyzeWithClaude(analysisInput, type);
+      insights = await analyzeWithAI(analysisInput, type);
     } catch (error) {
-      console.error('Claude API error, falling back to mock:', error);
+      console.error('OpenAI API error, falling back to mock:', error);
       insights = generateMockInsights(analysisInput, type);
     }
   } else {

@@ -29,6 +29,6 @@ export const env = {
   dataSourceMode: (process.env.DATA_SOURCE_MODE || 'mock') as 'mock' | 'live',
 
   // AI Engine
-  anthropicApiKey: process.env.ANTHROPIC_API_KEY || '',
+  openaiApiKey: process.env.OPENAI_API_KEY || '',
   aiEngineUrl: process.env.AI_ENGINE_URL || 'http://localhost:8000',
 } as const;
