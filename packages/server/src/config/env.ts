@@ -31,4 +31,13 @@ export const env = {
   // AI Engine
   openaiApiKey: process.env.OPENAI_API_KEY || '',
   aiEngineUrl: process.env.AI_ENGINE_URL || 'http://localhost:8000',
+
+  // Google APIs
+  google: {
+    clientId: process.env.GOOGLE_CLIENT_ID || '',
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
+    refreshToken: process.env.GOOGLE_REFRESH_TOKEN || '',
+    adsDeveloperToken: process.env.GOOGLE_ADS_DEVELOPER_TOKEN || '',
+    searchConsoleSiteUrl: process.env.GOOGLE_SEARCH_CONSOLE_SITE_URL || 'https://www.astra-honda.com',
+  },
 } as const;

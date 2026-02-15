@@ -312,7 +312,7 @@ export default function OnboardingTour() {
 
   return (
     <div className="fixed inset-0 z-[100]" style={{ pointerEvents: 'none' }}>
-      {/* Overlay — clip-path cuts a hole so the highlighted element stays clickable */}
+      {/* Overlay — SVG mask cuts a hole so the highlighted element stays clickable */}
       {isCenter ? (
         <div
           className="absolute inset-0 bg-black/60 backdrop-blur-sm"
@@ -322,26 +322,34 @@ export default function OnboardingTour() {
         const pad = 6;
         const hL = spotlight.left - pad;
         const hT = spotlight.top - pad;
-        const hR = spotlight.left + spotlight.width + pad;
-        const hB = spotlight.top + spotlight.height + pad;
-        const vw = window.innerWidth;
-        const vh = window.innerHeight;
+        const hW = spotlight.width + pad * 2;
+        const hH = spotlight.height + pad * 2;
 
         return (
           <>
-            {/* Single overlay with clip-path hole — clicks pass through the hole to elements below */}
-            <div
+            {/* SVG overlay with mask hole — fully cross-browser compatible */}
+            <svg
               style={{
                 position: 'fixed',
                 top: 0,
                 left: 0,
-                width: vw,
-                height: vh,
-                background: 'rgba(0,0,0,0.55)',
+                width: '100%',
+                height: '100%',
                 pointerEvents: 'auto',
-                clipPath: `path(evenodd, "M 0 0 H ${vw} V ${vh} H 0 Z M ${hL} ${hT} H ${hR} V ${hB} H ${hL} Z")`,
               }}
-            />
+            >
+              <defs>
+                <mask id="tour-spotlight-mask">
+                  <rect x="0" y="0" width="100%" height="100%" fill="white" />
+                  <rect x={hL} y={hT} width={hW} height={hH} rx="8" fill="black" />
+                </mask>
+              </defs>
+              <rect
+                x="0" y="0" width="100%" height="100%"
+                fill="rgba(0,0,0,0.55)"
+                mask="url(#tour-spotlight-mask)"
+              />
+            </svg>
             {/* Pulse ring around spotlight — no pointer events */}
             <div
               className="absolute rounded-xl border-2 border-blue-400 animate-pulse"

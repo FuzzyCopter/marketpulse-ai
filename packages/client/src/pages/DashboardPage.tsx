@@ -1,16 +1,34 @@
-import { useEffect } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useCampaignStore } from '../store/campaign.store';
+import { useSocket } from '../hooks/useSocket';
 import KPISection from '../components/dashboard/KPISection';
 import ChannelBreakdown from '../components/dashboard/ChannelBreakdown';
 import TrendChart from '../components/dashboard/TrendChart';
-import { MousePointerClick, Eye, Globe, Wallet, Calendar, Target } from 'lucide-react';
+import { MousePointerClick, Eye, Globe, Wallet, Calendar, Target, Wifi } from 'lucide-react';
 
 export default function DashboardPage() {
   const { dashboardData, isLoading, activeCampaignId, fetchDashboard } = useCampaignStore();
+  const [liveMetrics, setLiveMetrics] = useState<{ clicks: number; visits: number; cost: number; conversions: number } | null>(null);
+  const [lastUpdate, setLastUpdate] = useState<string | null>(null);
 
   useEffect(() => {
     fetchDashboard(activeCampaignId);
+    setLiveMetrics(null);
+    setLastUpdate(null);
   }, [activeCampaignId, fetchDashboard]);
+
+  const handleSocketUpdate = useCallback((data: { timestamp: string; campaignId: number; metrics: { clicksToday: number; visitsToday: number; costToday: number; conversionsToday: number } }) => {
+    if (data.campaignId !== activeCampaignId) return;
+    setLiveMetrics({
+      clicks: data.metrics.clicksToday,
+      visits: data.metrics.visitsToday,
+      cost: data.metrics.costToday,
+      conversions: data.metrics.conversionsToday,
+    });
+    setLastUpdate(new Date(data.timestamp).toLocaleTimeString('id-ID'));
+  }, [activeCampaignId]);
+
+  useSocket(activeCampaignId, handleSocketUpdate);
 
   if (isLoading || !dashboardData) {
     return (
@@ -38,9 +56,9 @@ export default function DashboardPage() {
 
   const quickMetrics = [
     { title: 'Impressions', value: todayMetrics.impressions, icon: Eye, color: 'from-blue-500 to-blue-600', bgLight: 'bg-blue-50' },
-    { title: 'Clicks', value: todayMetrics.clicks, icon: MousePointerClick, color: 'from-emerald-500 to-emerald-600', bgLight: 'bg-emerald-50' },
-    { title: 'Visits', value: todayMetrics.visits, icon: Globe, color: 'from-purple-500 to-purple-600', bgLight: 'bg-purple-50' },
-    { title: 'Cost', value: todayMetrics.cost, icon: Wallet, color: 'from-amber-500 to-amber-600', bgLight: 'bg-amber-50', isCurrency: true },
+    { title: 'Clicks', value: liveMetrics?.clicks ?? todayMetrics.clicks, icon: MousePointerClick, color: 'from-emerald-500 to-emerald-600', bgLight: 'bg-emerald-50' },
+    { title: 'Visits', value: liveMetrics?.visits ?? todayMetrics.visits, icon: Globe, color: 'from-purple-500 to-purple-600', bgLight: 'bg-purple-50' },
+    { title: 'Cost', value: liveMetrics?.cost ?? todayMetrics.cost, icon: Wallet, color: 'from-amber-500 to-amber-600', bgLight: 'bg-amber-50', isCurrency: true },
   ];
 
   return (
@@ -108,6 +126,18 @@ export default function DashboardPage() {
           </div>
         ))}
       </div>
+
+      {/* Live update indicator */}
+      {lastUpdate && (
+        <div className="flex items-center gap-1.5 text-xs text-emerald-600">
+          <Wifi size={12} />
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+          </span>
+          <span>Live — updated {lastUpdate}</span>
+        </div>
+      )}
 
       {/* KPI Progress */}
       <div data-tour="kpi-section">
