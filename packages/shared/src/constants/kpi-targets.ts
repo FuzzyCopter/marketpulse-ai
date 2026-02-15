@@ -25,6 +25,8 @@ export interface CampaignDefinition {
   startDate: string;
   endDate: string;
   totalDays: number;
+  siteUrl?: string;
+  adsCustomerId?: string;
   audience: {
     gender: string;
     ageRange: string;
@@ -43,6 +45,8 @@ export const HONDA_CAMPAIGNS: Record<string, CampaignDefinition> = {
     startDate: '2026-02-14',
     endDate: '2026-02-28',
     totalDays: 15,
+    siteUrl: 'https://www.astra-honda.com',
+    adsCustomerId: '7358954850',
     audience: {
       gender: 'Male & Female',
       ageRange: '25-50',
@@ -85,6 +89,8 @@ export const HONDA_CAMPAIGNS: Record<string, CampaignDefinition> = {
     startDate: '2026-03-08',
     endDate: '2026-03-28',
     totalDays: 21,
+    siteUrl: 'https://www.astra-honda.com',
+    adsCustomerId: '7358954850',
     audience: {
       gender: 'Male & Female',
       ageRange: '25-50',

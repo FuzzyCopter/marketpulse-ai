@@ -31,6 +31,8 @@ interface ManagedCampaign {
   endDate: string;
   totalDays: number;
   totalBudget: number;
+  siteUrl: string;
+  adsCustomerId: string;
   channels: CampaignChannel[];
   createdAt: string;
 }
@@ -108,7 +110,7 @@ router.get('/campaigns', authMiddleware, (_req: Request, res: Response): void =>
 });
 
 router.post('/campaigns', authMiddleware, (req: Request, res: Response): void => {
-  const { clientId, name, description, startDate, endDate, channels } = req.body;
+  const { clientId, name, description, startDate, endDate, channels, siteUrl, adsCustomerId } = req.body;
 
   if (!clientId || !name || !startDate || !endDate) {
     res.status(400).json({ error: 'clientId, name, startDate, endDate are required' });
@@ -147,6 +149,8 @@ router.post('/campaigns', authMiddleware, (req: Request, res: Response): void =>
     endDate,
     totalDays,
     totalBudget,
+    siteUrl: siteUrl || '',
+    adsCustomerId: (adsCustomerId || '').replace(/-/g, ''),
     channels: campaignChannels,
     createdAt: new Date().toISOString(),
   };
@@ -167,6 +171,8 @@ router.patch('/campaigns/:id', authMiddleware, (req: Request, res: Response): vo
   if (req.body.description !== undefined) campaign.description = req.body.description;
   if (req.body.startDate) campaign.startDate = req.body.startDate;
   if (req.body.endDate) campaign.endDate = req.body.endDate;
+  if (req.body.siteUrl !== undefined) campaign.siteUrl = req.body.siteUrl;
+  if (req.body.adsCustomerId !== undefined) campaign.adsCustomerId = req.body.adsCustomerId.replace(/-/g, '');
   if (req.body.channels) {
     campaign.channels = req.body.channels;
     campaign.totalBudget = campaign.channels.reduce((sum, ch) => sum + ch.budget, 0);

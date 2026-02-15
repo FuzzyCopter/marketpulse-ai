@@ -1,6 +1,6 @@
 import { google } from 'googleapis';
 import { getGoogleAuth } from './google-auth.js';
-import { env } from '../../config/env.js';
+import { getCampaignConfig } from './campaign-config.js';
 import type { SEORanking, SEOPageAudit } from '@marketpulse/shared';
 import type { ISEOProvider, BacklinkData, TechnicalIssue } from '../interfaces.js';
 import { MockSEOProvider } from '../mock/seo.mock.js';
@@ -8,18 +8,17 @@ import { MockSEOProvider } from '../mock/seo.mock.js';
 const mockFallback = new MockSEOProvider();
 
 export class LiveSEOProvider implements ISEOProvider {
-  private siteUrl = env.google.searchConsoleSiteUrl;
-
   private getSearchConsole() {
     return google.searchconsole({ version: 'v1', auth: getGoogleAuth() });
   }
 
   async getRankings(campaignId: number, startDate: string, endDate: string): Promise<SEORanking[]> {
+    const { siteUrl } = getCampaignConfig(campaignId);
     try {
       const sc = this.getSearchConsole();
 
       const response = await sc.searchanalytics.query({
-        siteUrl: this.siteUrl,
+        siteUrl,
         requestBody: {
           startDate,
           endDate,
@@ -31,7 +30,7 @@ export class LiveSEOProvider implements ISEOProvider {
 
       const rows = response.data.rows || [];
       if (rows.length === 0) {
-        console.log('[LiveSEO] No Search Console data, falling back to mock');
+        console.log(`[LiveSEO] No Search Console data for ${siteUrl}, falling back to mock`);
         return mockFallback.getRankings(campaignId, startDate, endDate);
       }
 
@@ -42,8 +41,8 @@ export class LiveSEOProvider implements ISEOProvider {
         keyword: row.keys?.[0] || '',
         url: row.keys?.[1] || null,
         position: row.position ? Math.round(row.position * 10) / 10 : null,
-        previousPosition: null, // GSC doesn't provide previous position directly
-        searchVolume: null, // GSC doesn't provide search volume
+        previousPosition: null,
+        searchVolume: null,
         difficulty: null,
         metricDate: row.keys?.[2] || startDate,
         clicks: row.clicks || 0,
@@ -51,27 +50,20 @@ export class LiveSEOProvider implements ISEOProvider {
         ctr: row.ctr ? Math.round(row.ctr * 10000) / 100 : 0,
       }));
     } catch (err: any) {
-      console.error('[LiveSEO] Search Console getRankings error:', err.message);
-      console.log('[LiveSEO] Falling back to mock data');
+      console.error(`[LiveSEO] Search Console error for ${siteUrl}:`, err.message);
       return mockFallback.getRankings(campaignId, startDate, endDate);
     }
   }
 
   async getPageAudits(campaignId: number): Promise<SEOPageAudit[]> {
-    // URL Inspection API requires individual URL checks — expensive.
-    // Fall back to mock for now; can be enhanced later with PageSpeed Insights API.
     return mockFallback.getPageAudits(campaignId);
   }
 
   async getBacklinks(campaignId: number): Promise<BacklinkData[]> {
-    // Google Search Console doesn't provide backlink data.
-    // Would need Ahrefs/Moz/Semrush API for real backlink data.
     return mockFallback.getBacklinks(campaignId);
   }
 
   async getTechnicalIssues(campaignId: number): Promise<TechnicalIssue[]> {
-    // Could integrate with Search Console URL Inspection or PageSpeed Insights.
-    // Fall back to mock for now.
     return mockFallback.getTechnicalIssues(campaignId);
   }
 }

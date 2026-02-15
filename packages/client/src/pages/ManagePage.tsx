@@ -3,7 +3,7 @@ import { useCampaignStore } from '../store/campaign.store';
 import api from '../services/api';
 import {
   Briefcase, Plus, Trash2, Edit3, X, Check, FolderOpen,
-  Calendar, Target, DollarSign, Hash, Building2, ChevronDown, ChevronUp,
+  Calendar, Target, DollarSign, Hash, Building2, ChevronDown, ChevronUp, Globe, Key,
 } from 'lucide-react';
 
 interface Client {
@@ -31,6 +31,8 @@ interface ManagedCampaign {
   endDate: string;
   totalDays: number;
   totalBudget: number;
+  siteUrl: string;
+  adsCustomerId: string;
   channels: CampaignChannel[];
   createdAt: string;
 }
@@ -67,6 +69,8 @@ export default function ManagePage() {
     description: '',
     startDate: '',
     endDate: '',
+    siteUrl: '',
+    adsCustomerId: '',
     channels: [] as { channelType: string; targetMetric: string; targetValue: number; budget: number }[],
   });
 
@@ -143,7 +147,7 @@ export default function ManagePage() {
       return;
     }
     await api.post('/manage/campaigns', newCampaign);
-    setNewCampaign({ clientId: 0, name: '', description: '', startDate: '', endDate: '', channels: [] });
+    setNewCampaign({ clientId: 0, name: '', description: '', startDate: '', endDate: '', siteUrl: '', adsCustomerId: '', channels: [] });
     setShowNewCampaign(false);
     fetchAll();
     // Refresh global campaign list so it shows in selector
@@ -289,6 +293,36 @@ export default function ManagePage() {
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
                     placeholder="Campaign description..."
                   />
+                </div>
+
+                {/* Google Integration */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">
+                    <Globe className="w-3.5 h-3.5 inline mr-1" />
+                    Site URL (optional)
+                  </label>
+                  <input
+                    type="url"
+                    value={newCampaign.siteUrl}
+                    onChange={(e) => setNewCampaign({ ...newCampaign, siteUrl: e.target.value })}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                    placeholder="https://www.example.com"
+                  />
+                  <p className="text-xs text-gray-400 mt-1">For Google Search Console data</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">
+                    <Key className="w-3.5 h-3.5 inline mr-1" />
+                    Google Ads Customer ID (optional)
+                  </label>
+                  <input
+                    type="text"
+                    value={newCampaign.adsCustomerId}
+                    onChange={(e) => setNewCampaign({ ...newCampaign, adsCustomerId: e.target.value })}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                    placeholder="123-456-7890"
+                  />
+                  <p className="text-xs text-gray-400 mt-1">For Google Ads live metrics</p>
                 </div>
               </div>
 

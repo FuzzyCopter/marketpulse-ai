@@ -1,4 +1,5 @@
 import { getGoogleAuth } from './google-auth.js';
+import { getCampaignConfig } from './campaign-config.js';
 import { env } from '../../config/env.js';
 import type { MetricsQuery, MetricsResult, SEMKeyword, SEMKeywordMetric } from '@marketpulse/shared';
 import type {
@@ -19,10 +20,10 @@ const ADS_BASE_URL = `https://googleads.googleapis.com/${ADS_API_VERSION}`;
 const searchMockFallback = new MockSearchAdsProvider();
 const discoveryMockFallback = new MockDiscoveryAdsProvider();
 
-async function queryGoogleAds(gaql: string): Promise<any[]> {
+async function queryGoogleAds(gaql: string, overrideCustomerId?: string): Promise<any[]> {
   const auth = getGoogleAuth();
   const { token } = await auth.getAccessToken();
-  const customerId = env.google.adsCustomerId;
+  const customerId = overrideCustomerId || env.google.adsCustomerId;
 
   const res = await fetch(
     `${ADS_BASE_URL}/customers/${customerId}/googleAds:searchStream`,
@@ -58,8 +59,11 @@ function microsToCurrency(micros: string | number): number {
 // ── Live Search Ads Provider ─────────────────────────────────────
 
 export class LiveSearchAdsProvider implements ISearchAdsProvider {
+  private getCid(campaignId: number) { return getCampaignConfig(campaignId).adsCustomerId; }
+
   async getMetrics(query: MetricsQuery): Promise<MetricsResult> {
     try {
+      const cid = this.getCid(query.campaignId);
       const gaql = `
         SELECT
           segments.date,
@@ -75,7 +79,7 @@ export class LiveSearchAdsProvider implements ISearchAdsProvider {
         ORDER BY segments.date ASC
       `;
 
-      const results = await queryGoogleAds(gaql);
+      const results = await queryGoogleAds(gaql, cid);
       if (results.length === 0) {
         console.log('[LiveSearchAds] No data from Google Ads, falling back to mock');
         return searchMockFallback.getMetrics(query);
@@ -140,7 +144,8 @@ export class LiveSearchAdsProvider implements ISearchAdsProvider {
         LIMIT 100
       `;
 
-      const results = await queryGoogleAds(gaql);
+      const cid = this.getCid(campaignId);
+      const results = await queryGoogleAds(gaql, cid);
       if (results.length === 0) return searchMockFallback.getKeywords(campaignId);
 
       return results.map((row, i) => ({
@@ -184,7 +189,8 @@ export class LiveSearchAdsProvider implements ISearchAdsProvider {
           AND ad_group.status != 'REMOVED'
       `;
 
-      const results = await queryGoogleAds(gaql);
+      const cid = this.getCid(campaignId);
+      const results = await queryGoogleAds(gaql, cid);
       if (results.length === 0) return searchMockFallback.getAdGroups(campaignId);
 
       return results.map(row => ({
@@ -221,7 +227,8 @@ export class LiveSearchAdsProvider implements ISearchAdsProvider {
         LIMIT 50
       `;
 
-      const results = await queryGoogleAds(gaql);
+      const cid = this.getCid(campaignId);
+      const results = await queryGoogleAds(gaql, cid);
       if (results.length === 0) return searchMockFallback.getSearchTerms(campaignId, startDate, endDate);
 
       return results.map(row => ({
@@ -247,6 +254,8 @@ export class LiveSearchAdsProvider implements ISearchAdsProvider {
 // ── Live Discovery Ads Provider ──────────────────────────────────
 
 export class LiveDiscoveryAdsProvider implements IDiscoveryAdsProvider {
+  private getCid(campaignId: number) { return getCampaignConfig(campaignId).adsCustomerId; }
+
   async getMetrics(query: MetricsQuery): Promise<MetricsResult> {
     try {
       const gaql = `
@@ -264,7 +273,8 @@ export class LiveDiscoveryAdsProvider implements IDiscoveryAdsProvider {
         ORDER BY segments.date ASC
       `;
 
-      const results = await queryGoogleAds(gaql);
+      const cid = this.getCid(query.campaignId);
+      const results = await queryGoogleAds(gaql, cid);
       if (results.length === 0) {
         console.log('[LiveDiscovery] No data from Google Ads, falling back to mock');
         return discoveryMockFallback.getMetrics(query);
@@ -329,7 +339,8 @@ export class LiveDiscoveryAdsProvider implements IDiscoveryAdsProvider {
         LIMIT 10
       `;
 
-      const results = await queryGoogleAds(gaql);
+      const cid = this.getCid(campaignId);
+      const results = await queryGoogleAds(gaql, cid);
       if (results.length === 0) return discoveryMockFallback.getCreativePerformance(campaignId);
 
       return results.map((row, i) => ({
@@ -362,7 +373,8 @@ export class LiveDiscoveryAdsProvider implements IDiscoveryAdsProvider {
         ORDER BY metrics.impressions DESC
       `;
 
-      const results = await queryGoogleAds(gaql);
+      const cid = this.getCid(campaignId);
+      const results = await queryGoogleAds(gaql, cid);
       if (results.length === 0) return discoveryMockFallback.getAudienceBreakdown(campaignId);
 
       return results.map(row => ({
