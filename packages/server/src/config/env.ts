@@ -38,6 +38,7 @@ export const env = {
     clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
     refreshToken: process.env.GOOGLE_REFRESH_TOKEN || '',
     adsDeveloperToken: process.env.GOOGLE_ADS_DEVELOPER_TOKEN || '',
+    adsCustomerId: process.env.GOOGLE_ADS_CUSTOMER_ID?.replace(/-/g, '') || '',
     searchConsoleSiteUrl: process.env.GOOGLE_SEARCH_CONSOLE_SITE_URL || 'https://www.astra-honda.com',
   },
 } as const;
