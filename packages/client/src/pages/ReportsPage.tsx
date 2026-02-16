@@ -29,8 +29,12 @@ export default function ReportsPage() {
   }, [activeCampaignId]);
 
   const fetchReports = async () => {
-    const { data } = await api.get(`/reports?campaignId=${activeCampaignId}`);
-    setReports(data);
+    try {
+      const { data } = await api.get(`/reports?campaignId=${activeCampaignId}`);
+      setReports(data);
+    } catch (err: any) {
+      console.error('[Reports] fetch error:', err);
+    }
   };
 
   const generateReport = async () => {
@@ -39,6 +43,9 @@ export default function ReportsPage() {
     try {
       await api.post('/reports/generate', { campaignId: activeCampaignId, type: reportType });
       fetchReports();
+    } catch (err: any) {
+      console.error('[Reports] generate error:', err);
+      alert(err.response?.data?.error || 'Failed to generate report');
     } finally {
       setGenerating(false);
     }

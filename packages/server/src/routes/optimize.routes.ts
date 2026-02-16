@@ -50,29 +50,39 @@ router.delete('/rules/:id', (req: Request, res: Response): void => {
 
 // POST /api/optimize/execute — execute manual action
 router.post('/execute', async (req: Request, res: Response): Promise<void> => {
-  const { campaignId, actionType, target, params } = req.body;
+  try {
+    const { campaignId, actionType, target, params } = req.body;
 
-  if (!campaignId || !actionType || !target) {
-    res.status(400).json({ error: 'campaignId, actionType, and target are required' });
-    return;
+    if (!campaignId || !actionType || !target) {
+      res.status(400).json({ error: 'campaignId, actionType, and target are required' });
+      return;
+    }
+
+    const log = await executeAction(
+      campaignId,
+      actionType,
+      target,
+      params || {},
+      'manual',
+      req.user!.userId
+    );
+    res.json(log);
+  } catch (err: any) {
+    console.error('[Optimize] execute error:', err.message);
+    res.status(500).json({ error: 'Failed to execute optimization action' });
   }
-
-  const log = await executeAction(
-    campaignId,
-    actionType,
-    target,
-    params || {},
-    'manual',
-    req.user!.userId
-  );
-  res.json(log);
 });
 
 // POST /api/optimize/evaluate/:campaignId — run all rules
 router.post('/evaluate/:campaignId', async (req: Request, res: Response): Promise<void> => {
-  const campaignId = parseInt(req.params.campaignId as string);
-  const triggered = await evaluateRules(campaignId);
-  res.json({ triggered: triggered.length, actions: triggered });
+  try {
+    const campaignId = parseInt(req.params.campaignId as string);
+    const triggered = await evaluateRules(campaignId);
+    res.json({ triggered: triggered.length, actions: triggered });
+  } catch (err: any) {
+    console.error('[Optimize] evaluate error:', err.message);
+    res.status(500).json({ error: 'Failed to evaluate optimization rules' });
+  }
 });
 
 // === Logs ===
@@ -94,24 +104,29 @@ router.get('/suggestions', (req: Request, res: Response): void => {
 
 // POST /api/optimize/suggestions/:id/apply — apply a suggestion
 router.post('/suggestions/:id/apply', async (req: Request, res: Response): Promise<void> => {
-  const suggestions = getSuggestions();
-  const suggestion = suggestions.find(s => s.id === (req.params.id as string));
+  try {
+    const suggestions = getSuggestions();
+    const suggestion = suggestions.find(s => s.id === (req.params.id as string));
 
-  if (!suggestion) {
-    res.status(404).json({ error: 'Suggestion not found' });
-    return;
+    if (!suggestion) {
+      res.status(404).json({ error: 'Suggestion not found' });
+      return;
+    }
+
+    const log = await executeAction(
+      suggestion.campaignId,
+      suggestion.actionType,
+      suggestion.targetEntity,
+      { ...suggestion.suggestedValue, reason: suggestion.reason },
+      'ai',
+      req.user!.userId
+    );
+
+    res.json({ message: 'Suggestion applied', action: log });
+  } catch (err: any) {
+    console.error('[Optimize] apply suggestion error:', err.message);
+    res.status(500).json({ error: 'Failed to apply suggestion' });
   }
-
-  const log = await executeAction(
-    suggestion.campaignId,
-    suggestion.actionType,
-    suggestion.targetEntity,
-    { ...suggestion.suggestedValue, reason: suggestion.reason },
-    'ai',
-    req.user!.userId
-  );
-
-  res.json({ message: 'Suggestion applied', action: log });
 });
 
 export default router;

@@ -30,12 +30,17 @@ router.get('/:id/html', optionalAuth, (req: Request, res: Response): void => {
 
 // GET /api/reports/preview/:campaignId — preview report
 router.get('/preview/:campaignId', optionalAuth, async (req: Request, res: Response): Promise<void> => {
-  const campaignId = parseInt(req.params.campaignId as string);
-  const type = (req.query.type as string) || 'weekly';
-  const reportData = await generateReport(campaignId, type as 'weekly' | 'monthly' | 'campaign');
-  const html = generateReportHTML(reportData);
-  res.setHeader('Content-Type', 'text/html');
-  res.send(html);
+  try {
+    const campaignId = parseInt(req.params.campaignId as string);
+    const type = (req.query.type as string) || 'weekly';
+    const reportData = await generateReport(campaignId, type as 'weekly' | 'monthly' | 'campaign');
+    const html = generateReportHTML(reportData);
+    res.setHeader('Content-Type', 'text/html');
+    res.send(html);
+  } catch (err: any) {
+    console.error('[Reports] preview error:', err.message);
+    res.status(500).json({ error: 'Failed to generate report preview' });
+  }
 });
 
 // All other routes require auth
@@ -49,10 +54,15 @@ router.get('/', (req: Request, res: Response): void => {
 
 // POST /api/reports/generate
 router.post('/generate', async (req: Request, res: Response): Promise<void> => {
-  const { campaignId, type } = req.body;
-  if (!campaignId) { res.status(400).json({ error: 'campaignId required' }); return; }
-  const reportData = await generateReport(campaignId, type || 'weekly');
-  res.json(reportData);
+  try {
+    const { campaignId, type } = req.body;
+    if (!campaignId) { res.status(400).json({ error: 'campaignId required' }); return; }
+    const reportData = await generateReport(campaignId, type || 'weekly');
+    res.json(reportData);
+  } catch (err: any) {
+    console.error('[Reports] generate error:', err.message);
+    res.status(500).json({ error: 'Failed to generate report' });
+  }
 });
 
 // GET /api/reports/:id

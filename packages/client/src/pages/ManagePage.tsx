@@ -79,21 +79,29 @@ export default function ManagePage() {
   }, []);
 
   const fetchAll = async () => {
-    const [clientsRes, campaignsRes] = await Promise.all([
-      api.get('/manage/clients'),
-      api.get('/manage/campaigns'),
-    ]);
-    setClients(clientsRes.data);
-    setCampaigns(campaignsRes.data);
+    try {
+      const [clientsRes, campaignsRes] = await Promise.all([
+        api.get('/manage/clients'),
+        api.get('/manage/campaigns'),
+      ]);
+      setClients(clientsRes.data);
+      setCampaigns(campaignsRes.data);
+    } catch (err: any) {
+      console.error('[Manage] fetchAll error:', err);
+    }
   };
 
   // ── Client actions ────────────────────────────────────────────
   const createClient = async () => {
     if (!newClient.name.trim()) return;
-    await api.post('/manage/clients', newClient);
-    setNewClient({ name: '', industry: '' });
-    setShowNewClient(false);
-    fetchAll();
+    try {
+      await api.post('/manage/clients', newClient);
+      setNewClient({ name: '', industry: '' });
+      setShowNewClient(false);
+      fetchAll();
+    } catch (err: any) {
+      alert(err.response?.data?.error || 'Failed to create client');
+    }
   };
 
   const deleteClient = async (id: number) => {

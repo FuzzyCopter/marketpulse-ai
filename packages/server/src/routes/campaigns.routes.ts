@@ -57,52 +57,57 @@ router.get('/:id', authMiddleware, (req: Request, res: Response): void => {
 });
 
 router.get('/:id/metrics', authMiddleware, async (req: Request, res: Response): Promise<void> => {
-  const campaignId = parseInt(req.params.id as string, 10);
-  const channel = req.query.channel as string | undefined;
-  const startDate = req.query.startDate as string | undefined;
-  const endDate = req.query.endDate as string | undefined;
-  const granularity = (req.query.granularity as 'daily' | 'weekly') || 'daily';
+  try {
+    const campaignId = parseInt(req.params.id as string, 10);
+    const channel = req.query.channel as string | undefined;
+    const startDate = req.query.startDate as string | undefined;
+    const endDate = req.query.endDate as string | undefined;
+    const granularity = (req.query.granularity as 'daily' | 'weekly') || 'daily';
 
-  const campaign = CAMPAIGNS.find(c => c.id === campaignId);
-  if (!campaign) {
-    res.status(404).json({ error: 'Campaign not found' });
-    return;
+    const campaign = CAMPAIGNS.find(c => c.id === campaignId);
+    if (!campaign) {
+      res.status(404).json({ error: 'Campaign not found' });
+      return;
+    }
+
+    const qStartDate = startDate || campaign.startDate;
+    const qEndDate = endDate || campaign.endDate;
+    const query = { campaignId, startDate: qStartDate, endDate: qEndDate, granularity };
+
+    if (channel === 'google_search') {
+      const result = await getSearchAdsProvider().getMetrics(query);
+      res.json(result);
+      return;
+    }
+    if (channel === 'google_discovery') {
+      const result = await getDiscoveryAdsProvider().getMetrics(query);
+      res.json(result);
+      return;
+    }
+    if (channel?.startsWith('social')) {
+      const result = await getSocialMediaProvider().getMetrics({ ...query, channelType: 'social_tiktok' });
+      res.json(result);
+      return;
+    }
+
+    // All channels combined
+    const [search, discovery, social] = await Promise.all([
+      getSearchAdsProvider().getMetrics(query),
+      getDiscoveryAdsProvider().getMetrics(query),
+      getSocialMediaProvider().getMetrics(query),
+    ]);
+
+    res.json({
+      channels: {
+        google_search: search,
+        google_discovery: discovery,
+        social_media: social,
+      },
+    });
+  } catch (err: any) {
+    console.error('[Campaigns] metrics error:', err.message);
+    res.status(500).json({ error: 'Failed to fetch campaign metrics' });
   }
-
-  const qStartDate = startDate || campaign.startDate;
-  const qEndDate = endDate || campaign.endDate;
-  const query = { campaignId, startDate: qStartDate, endDate: qEndDate, granularity };
-
-  if (channel === 'google_search') {
-    const result = await getSearchAdsProvider().getMetrics(query);
-    res.json(result);
-    return;
-  }
-  if (channel === 'google_discovery') {
-    const result = await getDiscoveryAdsProvider().getMetrics(query);
-    res.json(result);
-    return;
-  }
-  if (channel?.startsWith('social')) {
-    const result = await getSocialMediaProvider().getMetrics({ ...query, channelType: 'social_tiktok' });
-    res.json(result);
-    return;
-  }
-
-  // All channels combined
-  const [search, discovery, social] = await Promise.all([
-    getSearchAdsProvider().getMetrics(query),
-    getDiscoveryAdsProvider().getMetrics(query),
-    getSocialMediaProvider().getMetrics(query),
-  ]);
-
-  res.json({
-    channels: {
-      google_search: search,
-      google_discovery: discovery,
-      social_media: social,
-    },
-  });
 });
 
 function getStatus(startDate: string, endDate: string): string {

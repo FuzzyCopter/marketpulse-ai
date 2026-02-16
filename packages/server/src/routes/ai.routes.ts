@@ -10,68 +10,78 @@ router.use(authMiddleware);
 
 // GET /api/ai/insights/:campaignId
 router.get('/insights/:campaignId', async (req: Request, res: Response): Promise<void> => {
-  const campaignId = parseInt(req.params.campaignId as string);
-  const type = (req.query.type as string) || 'performance';
+  try {
+    const campaignId = parseInt(req.params.campaignId as string);
+    const type = (req.query.type as string) || 'performance';
 
-  // Build analysis input from campaign data
-  const campaignDef = campaignId === 1 ? HONDA_CAMPAIGNS.MBBH_2026 : HONDA_CAMPAIGNS.BALE_SANTAI;
-  const now = new Date();
-  const startDate = new Date(campaignDef.startDate);
-  const endDate = new Date(campaignDef.endDate);
-  const daysElapsed = Math.max(0, Math.floor((now.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)));
-  const status = now < startDate ? 'upcoming' : now > endDate ? 'completed' : 'active';
+    // Build analysis input from campaign data
+    const campaignDef = campaignId === 1 ? HONDA_CAMPAIGNS.MBBH_2026 : HONDA_CAMPAIGNS.BALE_SANTAI;
+    const now = new Date();
+    const startDate = new Date(campaignDef.startDate);
+    const endDate = new Date(campaignDef.endDate);
+    const daysElapsed = Math.max(0, Math.floor((now.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)));
+    const status = now < startDate ? 'upcoming' : now > endDate ? 'completed' : 'active';
 
-  // Get keyword data for SEM analysis
-  const searchProvider = getSearchAdsProvider();
-  const keywords = await searchProvider.getKeywords(campaignId);
+    // Get keyword data for SEM analysis
+    const searchProvider = getSearchAdsProvider();
+    const keywords = await searchProvider.getKeywords(campaignId);
 
-  // Build KPI progress
-  const kpiProgress = campaignDef.channels.map(ch => {
-    const target = ch.targetValue;
-    const dailyRate = target / campaignDef.totalDays;
-    const current = status === 'upcoming' ? 0 : Math.round(dailyRate * daysElapsed * (0.85 + Math.random() * 0.3));
-    const progressPercent = target > 0 ? Math.round((current / target) * 100) : 0;
-    const projectedTotal = daysElapsed > 0 ? Math.round((current / daysElapsed) * campaignDef.totalDays) : 0;
+    // Build KPI progress
+    const kpiProgress = campaignDef.channels.map(ch => {
+      const target = ch.targetValue;
+      const dailyRate = target / campaignDef.totalDays;
+      const current = status === 'upcoming' ? 0 : Math.round(dailyRate * daysElapsed * (0.85 + Math.random() * 0.3));
+      const progressPercent = target > 0 ? Math.round((current / target) * 100) : 0;
+      const projectedTotal = daysElapsed > 0 ? Math.round((current / daysElapsed) * campaignDef.totalDays) : 0;
 
-    return {
-      channel: ch.label,
-      metric: ch.targetMetric,
-      current,
-      target,
-      progressPercent,
-      projectedTotal,
-      onTrack: projectedTotal >= target * 0.9,
+      return {
+        channel: ch.label,
+        metric: ch.targetMetric,
+        current,
+        target,
+        progressPercent,
+        projectedTotal,
+        onTrack: projectedTotal >= target * 0.9,
+      };
+    });
+
+    const analysisInput = {
+      campaign: {
+        name: campaignDef.name,
+        startDate: campaignDef.startDate,
+        endDate: campaignDef.endDate,
+        status,
+        daysElapsed,
+        totalDays: campaignDef.totalDays,
+      },
+      kpiProgress,
+      keywords,
     };
-  });
 
-  const analysisInput = {
-    campaign: {
-      name: campaignDef.name,
-      startDate: campaignDef.startDate,
-      endDate: campaignDef.endDate,
-      status,
-      daysElapsed,
-      totalDays: campaignDef.totalDays,
-    },
-    kpiProgress,
-    keywords,
-  };
+    const insights = await getAIInsights(campaignId, analysisInput, type as 'performance' | 'optimize');
 
-  const insights = await getAIInsights(campaignId, analysisInput, type as 'performance' | 'optimize');
+    // Auto-generate optimization suggestions from AI insights
+    if (type === 'optimize') {
+      generateSuggestions(campaignId, insights);
+    }
 
-  // Auto-generate optimization suggestions from AI insights
-  if (type === 'optimize') {
-    generateSuggestions(campaignId, insights);
+    res.json({ insights, campaign: analysisInput.campaign, kpiProgress });
+  } catch (err: any) {
+    console.error('[AI] insights error:', err.message);
+    res.status(500).json({ error: 'Failed to fetch AI insights' });
   }
-
-  res.json({ insights, campaign: analysisInput.campaign, kpiProgress });
 });
 
 // POST /api/ai/refresh/:campaignId — force refresh cache
 router.post('/refresh/:campaignId', async (req: Request, res: Response): Promise<void> => {
-  const campaignId = parseInt(req.params.campaignId as string);
-  clearInsightCache(campaignId);
-  res.json({ message: 'Cache cleared', campaignId });
+  try {
+    const campaignId = parseInt(req.params.campaignId as string);
+    clearInsightCache(campaignId);
+    res.json({ message: 'Cache cleared', campaignId });
+  } catch (err: any) {
+    console.error('[AI] refresh error:', err.message);
+    res.status(500).json({ error: 'Failed to refresh AI cache' });
+  }
 });
 
 export default router;

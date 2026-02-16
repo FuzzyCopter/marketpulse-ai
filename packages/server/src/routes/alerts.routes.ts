@@ -62,8 +62,13 @@ router.post('/events/acknowledge-all', (req: Request, res: Response): void => {
 // === Evaluate ===
 
 router.post('/evaluate/:campaignId', async (req: Request, res: Response): Promise<void> => {
-  const triggered = await evaluateAlertRules(parseInt(req.params.campaignId as string));
-  res.json({ triggered: triggered.length, events: triggered });
+  try {
+    const triggered = await evaluateAlertRules(parseInt(req.params.campaignId as string));
+    res.json({ triggered: triggered.length, events: triggered });
+  } catch (err: any) {
+    console.error('[Alerts] evaluate error:', err.message);
+    res.status(500).json({ error: 'Failed to evaluate alert rules' });
+  }
 });
 
 // === Stats ===

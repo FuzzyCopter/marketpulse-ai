@@ -86,19 +86,21 @@ io.on('connection', (socket) => {
   });
 });
 
-// Mock real-time updates (emit every 30 seconds)
+// Mock real-time updates (emit every 30 seconds to all active campaign rooms)
 setInterval(() => {
-  const mockUpdate = {
-    timestamp: new Date().toISOString(),
-    campaignId: 1,
-    metrics: {
-      clicksToday: Math.round(1800 + Math.random() * 400),
-      visitsToday: Math.round(3000 + Math.random() * 600),
-      costToday: Math.round(2_500_000 + Math.random() * 500_000),
-      conversionsToday: Math.round(45 + Math.random() * 20),
-    },
-  };
-  io.to('campaign:1').emit('metrics:update', mockUpdate);
+  for (const campaignId of [1, 2]) {
+    const mockUpdate = {
+      timestamp: new Date().toISOString(),
+      campaignId,
+      metrics: {
+        clicksToday: Math.round(1800 + Math.random() * 400),
+        visitsToday: Math.round(3000 + Math.random() * 600),
+        costToday: Math.round(2_500_000 + Math.random() * 500_000),
+        conversionsToday: Math.round(45 + Math.random() * 20),
+      },
+    };
+    io.to(`campaign:${campaignId}`).emit('metrics:update', mockUpdate);
+  }
 }, 30000);
 
 // Start server
